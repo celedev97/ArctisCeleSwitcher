@@ -28,7 +28,7 @@
             this.timerRefreshStatus = new System.Windows.Forms.Timer(this.components);
             this.trayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.trayMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusLabel = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.impostazioniToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -57,42 +57,44 @@
             // trayMenu
             // 
             this.trayMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripMenuItem1,
+            this.statusLabel,
             this.toolStripSeparator2,
             this.impostazioniToolStripMenuItem,
             this.toolStripSeparator1,
             this.esciToolStripMenuItem});
             this.trayMenu.Name = "contextMenuStrip1";
-            this.trayMenu.Size = new System.Drawing.Size(143, 82);
+            this.trayMenu.Size = new System.Drawing.Size(181, 104);
+            this.trayMenu.Opened += new System.EventHandler(this.trayMenu_Opened);
             // 
-            // toolStripMenuItem1
+            // statusLabel
             // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(142, 22);
-            this.toolStripMenuItem1.Text = "Status";
+            this.statusLabel.Enabled = false;
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(180, 22);
+            this.statusLabel.Text = "HS: ? BAT: ?";
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(139, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // impostazioniToolStripMenuItem
             // 
             this.impostazioniToolStripMenuItem.Name = "impostazioniToolStripMenuItem";
-            this.impostazioniToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.impostazioniToolStripMenuItem.Text = "Impostazioni";
+            this.impostazioniToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.impostazioniToolStripMenuItem.Text = "Settings";
             this.impostazioniToolStripMenuItem.Click += new System.EventHandler(this.impostazioniToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(139, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // esciToolStripMenuItem
             // 
             this.esciToolStripMenuItem.Name = "esciToolStripMenuItem";
-            this.esciToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
-            this.esciToolStripMenuItem.Text = "Esci";
+            this.esciToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.esciToolStripMenuItem.Text = "Exit";
             this.esciToolStripMenuItem.Click += new System.EventHandler(this.esciToolStripMenuItem_Click);
             // 
             // comboArctis
@@ -154,7 +156,6 @@
             this.autoSwapCheckBox.TabIndex = 5;
             this.autoSwapCheckBox.Text = "Auto switch device based on arctis status";
             this.autoSwapCheckBox.UseVisualStyleBackColor = true;
-            this.autoSwapCheckBox.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // FormHidden
             // 
@@ -195,9 +196,11 @@
         private ToolStripMenuItem impostazioniToolStripMenuItem;
         private ToolStripMenuItem esciToolStripMenuItem;
         private ToolStripMenuItem tESTToolStripMenuItem;
-        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem statusLabel;
         private ToolStripSeparator toolStripSeparator2;
         private ToolStripSeparator toolStripSeparator1;
         private CheckBox autoSwapCheckBox;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem sendToneToolStripMenuItem;
     }
 }

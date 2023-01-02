@@ -63,7 +63,7 @@ namespace ArctisCeleSwitcher {
         private ArctisStatus? currentStatus = null;
 
         private void timerRefreshStatus_Tick(object sender, EventArgs e) {
-            currentStatus = ArctisHIDHelper.ReadStatus(arctisHID);
+            currentStatus = ArctisHIDHelper.ReadStatus(arctisHID!);
 
             var changed = lastStatus == null || lastStatus.online != currentStatus.online;
 
@@ -142,15 +142,8 @@ namespace ArctisCeleSwitcher {
         }
 
         private void esciToolStripMenuItem_Click(object sender, EventArgs e) {
+            arctisHID?.CloseDevice();
             Application.Exit();
-        }
-
-        private void testToolStripMenuItem_Click(object sender, EventArgs e) {
-            var status = new ArctisStatus();
-
-            ArctisHIDHelper.ReadStatus(arctisHID, status);
-
-            MessageBox.Show(status.ToString());
         }
 
         private void FormHidden_FormClosing(object sender, FormClosingEventArgs e) {
@@ -158,8 +151,8 @@ namespace ArctisCeleSwitcher {
             setVisibility(false);
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e) {
-
+        private void trayMenu_Opened(object sender, EventArgs e) {
+            statusLabel.Text = "Headset: "+(currentStatus?.online != null ? (currentStatus!.online ? "ON ":"OFF") : " ? ") + " Battery: " + (currentStatus?.battery.ToString() ?? " ? ") + "%";
         }
     }
 }
