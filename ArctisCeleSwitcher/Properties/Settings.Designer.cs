@@ -58,5 +58,29 @@ namespace ArctisCeleSwitcher.Properties {
                 this["AutoSwap"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid ArctisRecord {
+            get {
+                return ((global::System.Guid)(this["ArctisRecord"]));
+            }
+            set {
+                this["ArctisRecord"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("00000000-0000-0000-0000-000000000000")]
+        public global::System.Guid SpeakersRecord {
+            get {
+                return ((global::System.Guid)(this["SpeakersRecord"]));
+            }
+            set {
+                this["SpeakersRecord"] = value;
+            }
+        }
     }
 }

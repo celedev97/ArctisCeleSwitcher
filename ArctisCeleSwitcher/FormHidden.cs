@@ -23,38 +23,57 @@ namespace ArctisCeleSwitcher {
 
         CoreAudioController audioController = new CoreAudioController();
         HidDevice? arctisHID;
-        
-        CoreAudioDevice? arctisDevice;
-        CoreAudioDevice? speakerDevice;
 
-        private List<KeyValuePair<string, CoreAudioDevice>> comboArctisDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
-        private List<KeyValuePair<string, CoreAudioDevice>> comboSpeakerDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
+        CoreAudioDevice? arctisPlayBackDevice;
+        CoreAudioDevice? speakerPlaybackDevice;
+        CoreAudioDevice? arctisRecordDevice;
+        CoreAudioDevice? speakerRecordDevice;
+
+        private List<KeyValuePair<string, CoreAudioDevice>> comboArctisPlaybackDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
+        private List<KeyValuePair<string, CoreAudioDevice>> comboSpeakerPlaybackDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
+        
+        private List<KeyValuePair<string, CoreAudioDevice>> comboArctisCaptureDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
+        private List<KeyValuePair<string, CoreAudioDevice>> comboSpeakerCaptureDataSource = new List<KeyValuePair<string, CoreAudioDevice>>();
 
         private void GetDevices() {
             #region //getting audio devices from windows
-            var audioDevices = audioController.GetPlaybackDevices()
+            var audioPlaybackDevices = audioController.GetPlaybackDevices()
                     .Where(device => device.State == AudioSwitcher.AudioApi.DeviceState.Active)
                     .ToList();
 
-            comboArctisDataSource = audioDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
-            comboSpeakerDataSource = audioDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
+            var audioCaptureDevices = audioController.GetCaptureDevices()
+                    .Where(device => device.State == AudioSwitcher.AudioApi.DeviceState.Active)
+                    .ToList();
 
-            comboArctis.Items.Clear();
-            comboSpeaker.Items.Clear();
+            comboArctisPlaybackDataSource = audioPlaybackDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
+            comboSpeakerPlaybackDataSource = audioPlaybackDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
+
+            comboArctisCaptureDataSource = audioCaptureDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
+            comboSpeakerCaptureDataSource = audioCaptureDevices.Select(device => new KeyValuePair<string, CoreAudioDevice>(device.FullName, device)).ToList();
+
+            comboPlaybackArctis.Items.Clear();
+            comboPlaybackSpeaker.Items.Clear();
             
-            comboArctis.ValueMember = "Value";
-            comboArctis.DisplayMember = "Key";
-            comboSpeaker.ValueMember = "Value";
-            comboSpeaker.DisplayMember = "Key";
+            
+            comboPlaybackArctis.ValueMember = "Value";
+            comboPlaybackArctis.DisplayMember = "Key";
+            comboPlaybackSpeaker.ValueMember = "Value";
+            comboPlaybackSpeaker.DisplayMember = "Key";
+            comboRecordArctis.ValueMember = "Value";
+            comboRecordArctis.DisplayMember = "Key";
+            comboRecordSpeaker.ValueMember = "Value";
+            comboRecordSpeaker.DisplayMember = "Key";
 
-            comboArctis.DataSource = comboArctisDataSource;
-            comboSpeaker.DataSource = comboSpeakerDataSource;
+            comboPlaybackArctis.DataSource = comboArctisPlaybackDataSource;
+            comboPlaybackSpeaker.DataSource = comboSpeakerPlaybackDataSource;
+            comboRecordArctis.DataSource = comboArctisCaptureDataSource;
+            comboRecordSpeaker.DataSource = comboSpeakerCaptureDataSource;
             #endregion
 
             //getting arctis hid device
             arctisHID = arctisHID != null ? arctisHID : ArctisHIDHelper.FindArctis();
 
-            if (audioDevices.Count < 2 || arctisHID == null) {
+            if (audioPlaybackDevices.Count < 2 || arctisHID == null) {
                 MessageBox.Show("Error obtaining devices", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -70,9 +89,15 @@ namespace ArctisCeleSwitcher {
             if (changed) {
                 trayIcon.Icon = currentStatus.online ? Resources.headphones : Resources.speaker;
                 if (Settings.Default.AutoSwap) {
-                    var deviceToSet = currentStatus.online ? arctisDevice! : speakerDevice!;
-                    if (audioController.DefaultPlaybackDevice.Id != deviceToSet?.Id) {
-                        audioController.DefaultPlaybackDevice = deviceToSet;
+                    var playbackToSet = currentStatus.online ? arctisPlayBackDevice! : speakerPlaybackDevice!;
+                    var microphoneToSet = currentStatus.online ? arctisRecordDevice! : speakerRecordDevice!;
+                    if (audioController.DefaultPlaybackDevice.Id != playbackToSet?.Id) {
+                        audioController.DefaultPlaybackDevice = playbackToSet;
+                        audioController.DefaultPlaybackCommunicationsDevice = playbackToSet;
+                    }
+                    if (audioController.DefaultCaptureDevice.Id != microphoneToSet?.Id) {
+                        audioController.DefaultCaptureDevice = microphoneToSet;
+                        audioController.DefaultCaptureCommunicationsDevice = microphoneToSet;
                     }
                 }
             }
@@ -82,18 +107,24 @@ namespace ArctisCeleSwitcher {
         }
 
         private void save_Click(object sender, EventArgs e) {
-            if (comboArctis.SelectedValue == null || comboSpeaker.SelectedValue == null) {
-                MessageBox.Show("Select both devices", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (comboPlaybackArctis.SelectedValue == null ||
+                comboPlaybackSpeaker.SelectedValue == null ||
+                comboRecordArctis.SelectedValue == null ||
+                comboRecordSpeaker.SelectedValue == null
+                ) {
+                MessageBox.Show("Select all devices", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (comboArctis.SelectedValue == comboSpeaker.SelectedValue) {
+            if (comboPlaybackArctis.SelectedValue == comboPlaybackSpeaker.SelectedValue) {
                 MessageBox.Show("Set different devices for speakers and headphones", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Settings.Default.Arctis = ((CoreAudioDevice)comboArctis.SelectedValue).Id;
-            Settings.Default.Speakers = ((CoreAudioDevice)comboSpeaker.SelectedValue).Id;
+            Settings.Default.Arctis = ((CoreAudioDevice)comboPlaybackArctis.SelectedValue).Id;
+            Settings.Default.Speakers = ((CoreAudioDevice)comboPlaybackSpeaker.SelectedValue).Id;
+            Settings.Default.ArctisRecord = ((CoreAudioDevice)comboRecordArctis.SelectedValue).Id;
+            Settings.Default.SpeakersRecord = ((CoreAudioDevice)comboRecordSpeaker.SelectedValue).Id;
             Settings.Default.AutoSwap = autoSwapCheckBox.Checked;
 
             Settings.Default.Save();
@@ -118,21 +149,29 @@ namespace ArctisCeleSwitcher {
         private void loadSettings() {
             var arctisGUID = Settings.Default.Arctis;
             var speakersGUID = Settings.Default.Speakers;
+            var arctisRecordGUID = Settings.Default.ArctisRecord;
+            var speakersRecordGUID = Settings.Default.SpeakersRecord;
             autoSwapCheckBox.Checked = Settings.Default.AutoSwap;
 
             //setting the selected devices
-            var arctisToSet = comboArctisDataSource.Where(kvp => kvp.Value.Id == arctisGUID).FirstOrDefault();
-            var speakerToSet = comboSpeakerDataSource.Where(kvp => kvp.Value.Id == speakersGUID).FirstOrDefault();
+            var arctisToSet = comboArctisPlaybackDataSource.Where(kvp => kvp.Value.Id == arctisGUID).FirstOrDefault();
+            var speakerToSet = comboSpeakerPlaybackDataSource.Where(kvp => kvp.Value.Id == speakersGUID).FirstOrDefault();
+            var arctisRecordToSet = comboArctisCaptureDataSource.Where(kvp => kvp.Value.Id == arctisRecordGUID).FirstOrDefault();
+            var speakerRecordToSet = comboSpeakerCaptureDataSource.Where(kvp => kvp.Value.Id == speakersRecordGUID).FirstOrDefault();
 
-            comboArctis.SelectedItem = arctisToSet;
-            comboSpeaker.SelectedItem = speakerToSet;
+            comboPlaybackArctis.SelectedItem = arctisToSet;
+            comboPlaybackSpeaker.SelectedItem = speakerToSet;
+            comboRecordArctis.SelectedItem = arctisRecordToSet;
+            comboRecordSpeaker.SelectedItem = speakerRecordToSet;
 
-            if (arctisToSet.Value == null || speakerToSet.Value == null) {
+            if (arctisToSet.Value == null || speakerToSet.Value == null || arctisRecordToSet.Value == null || speakerRecordToSet.Value == null) {
                 setVisibility(true, false);
                 MessageBox.Show(this, "Please select your devices", "Arctis Cele Switcher", MessageBoxButtons.OK, MessageBoxIcon.Error);
             } else {
-                arctisDevice = arctisToSet.Value;
-                speakerDevice = speakerToSet.Value;
+                arctisPlayBackDevice = arctisToSet.Value;
+                speakerPlaybackDevice = speakerToSet.Value;
+                arctisRecordDevice = arctisRecordToSet.Value;
+                speakerRecordDevice = speakerRecordToSet.Value;
             }
 
         }
