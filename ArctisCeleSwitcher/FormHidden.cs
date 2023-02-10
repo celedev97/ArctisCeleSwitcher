@@ -84,10 +84,20 @@ namespace ArctisCeleSwitcher {
         private void timerRefreshStatus_Tick(object sender, EventArgs e) {
             currentStatus = ArctisHIDHelper.ReadStatus(arctisHID!);
 
-            var changed = lastStatus == null || lastStatus.online != currentStatus.online;
+            var changed = lastStatus == null || lastStatus.online != currentStatus.online || lastStatus.battery != currentStatus.battery;
 
             if (changed) {
-                trayIcon.Icon = currentStatus.online ? Resources.headphones : Resources.speaker;
+                if (currentStatus.online) {
+                    if (currentStatus.battery >= 75) {
+                        trayIcon.Icon = Resources.headphones_green;
+                    } else if (currentStatus.battery >= 50) {
+                        trayIcon.Icon = Resources.headphones_yellow;
+                    } else {
+                        trayIcon.Icon = Resources.headphones_red;
+                    }
+                } else {
+                    trayIcon.Icon = Resources.speaker;
+                }
                 if (Settings.Default.AutoSwap) {
                     var playbackToSet = currentStatus.online ? arctisPlayBackDevice! : speakerPlaybackDevice!;
                     var microphoneToSet = currentStatus.online ? arctisRecordDevice! : speakerRecordDevice!;
@@ -186,8 +196,10 @@ namespace ArctisCeleSwitcher {
         }
 
         private void FormHidden_FormClosing(object sender, FormClosingEventArgs e) {
-            e.Cancel = true;
-            setVisibility(false);
+            if (Visible) {
+                e.Cancel = true;
+                setVisibility(false);
+            }
         }
 
         private void trayMenu_Opened(object sender, EventArgs e) {

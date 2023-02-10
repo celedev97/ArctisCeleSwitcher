@@ -121,6 +121,15 @@
   <data name="headphones" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\icons\headphones.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="headphones_green" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\icons\headphones-green.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="headphones_red" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\icons\headphones-red.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="headphones_yellow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\icons\headphones-yellow.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="loading" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\icons\loading.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
